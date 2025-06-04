@@ -89,7 +89,10 @@ class MandalaManager:
             if missing_days:
                 # Есть пропуск — сбрасываем
                 await db.execute("DELETE FROM mandala_days WHERE mandala_id=?", (mid,))
-                await db.execute("UPDATE mandalas SET progress=0 WHERE id=?", (mid,))
+                await db.execute(
+                    "UPDATE mandalas SET progress=0, start_date=? WHERE id=?",
+                    (log_dt.isoformat(), mid),
+                )
                 await db.commit()
                 if own: await db.close(); return "reset"
 
