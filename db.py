@@ -2,8 +2,10 @@
 
 import aiosqlite
 
-# Путь к файлу базы данных
+# Путь к файлу базы данных пользователей
 DB_PATH = "sadhana.db"
+# Отдельная база знаний для ИИ ассистента
+KB_DB_PATH = "knowledge.db"
 
 # ✅ Инициализация базы данных
 async def init_db():
@@ -100,6 +102,7 @@ async def init_db():
                 created_at  TEXT,            -- timestamp() для сортировки
                UNIQUE(user_id, practice, start_date, end_date)
            );
+
         """)
         # 👇 Таблица базы знаний для виртуального ассистента
         await db.execute("""
@@ -109,7 +112,25 @@ async def init_db():
                 content TEXT NOT NULL
             );
         """)
+        await db.commit()
 
+    # Создаём отдельную БД знаний
+    await init_kb_db()
+
+
+async def init_kb_db():
+    """Инициализация базы знаний для ассистента."""
+    async with aiosqlite.connect(KB_DB_PATH) as db:
+        await db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS knowledge_base (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL
+            );
+            """
+        )
         await db.commit()
     await update_mode()
 
