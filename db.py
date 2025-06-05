@@ -98,7 +98,15 @@ async def init_db():
                 end_date    TEXT,            -- 2025-05-10
                 total_days  INTEGER,         -- 40 или 90
                 created_at  TEXT,            -- timestamp() для сортировки
-                UNIQUE(user_id, practice, start_date, end_date)
+               UNIQUE(user_id, practice, start_date, end_date)
+           );
+        """)
+        # 👇 Таблица базы знаний для виртуального ассистента
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS knowledge_base (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL
             );
         """)
 
