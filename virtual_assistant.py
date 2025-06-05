@@ -41,10 +41,15 @@ class VirtualAssistant:
             if self.index is not None:
                 return
             async with aiosqlite.connect(KB_DB_PATH) as db:
-                cur = await db.execute("SELECT id, title, content FROM knowledge_base")
+                cur = await db.execute(
+                    "SELECT id, category, title, content FROM knowledge_base"
+                )
                 rows = await cur.fetchall()
-            texts = [f"{title}\n{content}" for _id, title, content in rows]
-            metadatas = [{"id": _id, "title": title} for _id, title, _ in rows]
+            texts = [f"{title}\n{content}" for _id, _cat, title, content in rows]
+            metadatas = [
+                {"id": _id, "category": _cat, "title": title}
+                for _id, _cat, title, _ in rows
+            ]
             loop = asyncio.get_running_loop()
             self.index = await loop.run_in_executor(
                 None,
