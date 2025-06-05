@@ -23,6 +23,13 @@ class MandalaManager:
         if db is None:
             db, own = await aiosqlite.connect(DB_PATH), True
 
+        # ── проверяем, не активна ли уже мандала по этой практике ──
+        row = await self._get_active(uid, practice, db)
+        if row is not None:
+            if own:
+                await db.close()
+            return row[0]
+
         total = 40 if mode == "40x2" else 90
         cur = await db.execute("""
             INSERT INTO mandalas(user_id,practice,start_date,mode,total,progress,is_active)
