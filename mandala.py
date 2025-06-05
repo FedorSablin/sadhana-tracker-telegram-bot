@@ -20,47 +20,6 @@ class MandalaStates(StatesGroup):
     waiting_for_custom_dt  = State()
     choosing_mode       = State()
 
-# mandala.py
-from datetime import date, timedelta
-
-
-async def fill_missing_mandala_days(mandala_id: int, mode: str, start_date: date, db: aiosqlite.Connection | None = None):
-    own_conn = False
-    if db is None:
-        db = await aiosqlite.connect(DB_PATH)
-        own_conn = True
-
-    sessions_per_day = 2 if mode == "40x2" else 1
-    today = date.today()
-
-    # Получаем последний занесённый день мандалы
-    cur = await db.execute("SELECT MAX(date) FROM mandala_days WHERE mandala_id = ?", (mandala_id,))
-    last_date_row = await cur.fetchone()
-    last_date_str = last_date_row[0] if last_date_row else None
-    last_date = date.fromisoformat(last_date_str) if last_date_str else None
-
-    # Заполняем с даты после последней записи или с даты старта мандалы, если записей нет
-    fill_start = last_date + timedelta(days=1) if last_date else start_date
-
-    # Заполняем все дни от fill_start до сегодня включительно
-    day = fill_start
-    while day <= today:
-        # Вставляем запись, если её нет
-        await db.execute("""
-            INSERT OR IGNORE INTO mandala_days (mandala_id, date, sessions)
-            VALUES (?, ?, ?)
-        """, (mandala_id, day.isoformat(), sessions_per_day))
-        day += timedelta(days=1)
-
-    # Обновляем прогресс - сумма сессий
-    cur = await db.execute("SELECT SUM(sessions) FROM mandala_days WHERE mandala_id = ?", (mandala_id,))
-    progress = (await cur.fetchone())[0] or 0
-    await db.execute("UPDATE mandalas SET progress = ? WHERE id = ?", (progress, mandala_id))
-
-    await db.commit()
-
-    if own_conn:
-        await db.close()
 
 # 1. Команда /mandala — выбираем практику
 @router.message(Command("mandala"))
@@ -173,32 +132,6 @@ async def mandala_mode(call: CallbackQuery, state: FSMContext):
         f"✅ Мандала для «{practice.capitalize()}» запущена: {prog}/{total}"
     )
     await state.clear()
-
-
-async def tail_consecutive_days(db, mandala_id: int,
-                                required_sessions: int) -> int:
-    """
-    Считает подряд-дней С КОНЦА (от самой поздней даты к более ранним).
-    """
-    cur = await db.execute(
-        "SELECT date, sessions FROM mandala_days "
-        "WHERE mandala_id = ? ORDER BY date DESC",
-        (mandala_id,))
-    rows = await cur.fetchall()                 # отсортированы DESC
-    counter = 0
-    expected = None
-
-    for date_str, sess in rows:
-        d = date.fromisoformat(date_str)
-        if expected is None:
-            # первая (самая поздняя) записанная дата
-            expected = d
-        if d != expected or sess < required_sessions:
-            break                               # цепочка порвалась
-        counter += 1
-        expected = d - timedelta(days=1)        # ждём предыдущий день
-
-    return counter
 
 
 # Функции для внешнего подключения (используются в bot.py)
