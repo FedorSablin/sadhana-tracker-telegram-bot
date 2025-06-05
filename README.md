@@ -17,6 +17,14 @@ A Telegram bot for tracking daily sadhana (spiritual practice) progress. The bot
 
 ## Running the bot
 
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Open `.env` and set the required values:
+   - `BOT_TOKEN` – Telegram bot token
+   - `OPENAI_API_KEY` – OpenAI API key
+
 Initialize the database and start the bot:
 ```bash
 python bot.py
@@ -32,4 +40,5 @@ python load_kb.py path/to/articles.csv
 This step is optional and only needed for the virtual assistant feature.
 =======
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
 
