@@ -114,8 +114,8 @@ class MandalaManager:
         if row is None:
             await db.execute("""
                 INSERT INTO mandala_days(mandala_id,date,sessions)
-                VALUES(?,?,1)
-            """, (mid, log_dt.isoformat()))
+                VALUES(?,?,?)
+            """, (mid, log_dt.isoformat(), sessions))
         elif row[0] < sessions:
             await db.execute("""
                 UPDATE mandala_days SET sessions=?
