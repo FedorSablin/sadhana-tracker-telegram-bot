@@ -1,11 +1,10 @@
 import aiosqlite
-from aiogram import types
 from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from datetime import date, datetime, timedelta
+from datetime import date
 from db import DB_PATH
 from aiogram import Bot, Router
 from mandala_agent import mandala_mgr
