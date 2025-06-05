@@ -1,21 +1,16 @@
 import asyncio
 import os
-import json
 import random
 import aiosqlite
 import pytz
-import logging
-import asyncio
 import re
-import datetime as dt 
+import datetime as dt
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters import CommandStart
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
-from aiogram.types import FSInputFile
-from aiogram.types import BufferedInputFile
 from aiogram.types import BotCommand
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types import CallbackQuery
@@ -24,9 +19,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.client.default import DefaultBotProperties
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from aiogram import F, Router
+from aiogram import F
 from dotenv import load_dotenv
-from collections import defaultdict
 from datetime import datetime, timedelta, date, timezone
 from difflib import get_close_matches
 from db import init_db, save_practice_log, get_user_practices_with_cycles

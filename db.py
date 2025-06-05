@@ -1,7 +1,6 @@
 # db.py
 
 import aiosqlite
-import sqlite3
 
 # Путь к файлу базы данных
 DB_PATH = "sadhana.db"
