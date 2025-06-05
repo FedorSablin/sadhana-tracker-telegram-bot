@@ -357,17 +357,31 @@ class TZStates(StatesGroup):
 async def start_handler(message: Message, state: FSMContext):
     await state.clear()
     user_id = str(message.from_user.id)
-    # 1) узнаём, где юзер находится в онбординге
-    step = await get_onboarding_step(user_id)  # 👈 функция из Шага 1
 
-    # 2) формируем клавиатуру
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "INSERT OR IGNORE INTO users(user_id) VALUES(?)", (user_id,)
+        )
+        await db.commit()
+
+    await schedule_daily_notification(user_id)
+
+    step = await get_onboarding_step(user_id)
+
+    if step == 0:
+        await set_onboarding_step(user_id, 1)
+        await message.answer(
+            "Шаг 1 / 6. Давай сначала настроим часовой пояс.\n"
+            "Нажми на команду /settimezone или напиши ее в чате."
+        )
+        return
+
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📝 Записать практику", callback_data="log")],
         [InlineKeyboardButton(text="📈 Прогресс / График", callback_data="chart")],
         [InlineKeyboardButton(text="🌀 Мандала", callback_data="mandala_menu")],
         [InlineKeyboardButton(text="🏆 Достижения", callback_data="achievements")],
-        [InlineKeyboardButton(text="ℹ️ Справка", callback_data="help")] +
-        ([] if step >= 99 else [InlineKeyboardButton(text="🚀 Пройти вводный курс", callback_data="onb_start")])
+        [InlineKeyboardButton(text="ℹ️ Справка", callback_data="help")],
     ])
 
     await message.answer(
@@ -383,16 +397,6 @@ async def start_handler(message: Message, state: FSMContext):
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard
     )
-
-    # 1) Добавляем юзера (если его ещё нет) с дефолтным UTC
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute(
-            "INSERT OR IGNORE INTO users(user_id) VALUES(?)", (user_id,)
-        )
-        await db.commit()
-
-    # 2) Планируем ему ежедневные уведомления
-    await schedule_daily_notification(user_id)
 
 # ────────────────────────────────────────────────────────────────────
 # Onboarding helpers
