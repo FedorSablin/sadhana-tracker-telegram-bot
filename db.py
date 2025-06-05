@@ -102,6 +102,15 @@ async def init_db():
                 created_at  TEXT,            -- timestamp() для сортировки
                UNIQUE(user_id, practice, start_date, end_date)
            );
+
+        """)
+        # 👇 Таблица базы знаний для виртуального ассистента
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS knowledge_base (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL
+            );
         """)
         await db.commit()
 
@@ -123,6 +132,7 @@ async def init_kb_db():
             """
         )
         await db.commit()
+    await update_mode()
 
 # ✅ Сохранение логов практики
 async def save_practice_log(user_id: str, date: str, log: dict):
@@ -153,6 +163,3 @@ async def update_mode():
             WHERE mode IS NULL;
         """)
         await db.commit()
-
-# Запуск обновления базы
-        await update_mode()
