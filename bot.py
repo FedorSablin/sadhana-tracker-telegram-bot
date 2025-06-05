@@ -31,8 +31,7 @@ from datetime import datetime, timedelta, date, timezone
 from difflib import get_close_matches
 from db import init_db, save_practice_log, get_user_practices_with_cycles
 from db import DB_PATH
-from mandala_agent import MandalaManager
-mandala_mgr = MandalaManager()
+from mandala_agent import mandala_mgr
 from charts import build_chart
 from mandala import register_mandala_handlers  # ← добавили второе имя
 from mandala import MandalaStates, tail_consecutive_days
