@@ -111,6 +111,7 @@ async def init_db():
         """)
 
         await db.commit()
+    await update_mode()
 
 # ✅ Сохранение логов практики
 async def save_practice_log(user_id: str, date: str, log: dict):
@@ -141,6 +142,3 @@ async def update_mode():
             WHERE mode IS NULL;
         """)
         await db.commit()
-
-# Запуск обновления базы
-        await update_mode()
