@@ -94,17 +94,6 @@ class VirtualAssistant:
         llm = ChatOpenAI(model=self.model)
         resp = await llm.ainvoke(messages)
         return resp.content.strip()
-            {
-                "role": "system",
-                "content": "Ты виртуальный ассистент бота Sadhana. Используй контекст базы знаний в ответах",
-            }
-        ]
-        if context:
-            messages.append({"role": "system", "content": f"Контекст:\n{context}"})
-        messages.append({"role": "user", "content": question})
-
-        resp = await openai.ChatCompletion.acreate(model=self.model, messages=messages)
-        return resp.choices[0].message.content.strip()
 
 assistant = VirtualAssistant()
 
