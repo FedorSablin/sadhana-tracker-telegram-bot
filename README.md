@@ -38,7 +38,4 @@ If you have additional reference materials for the assistant, you can load them 
 python load_kb.py path/to/articles.csv
 ```
 This step is optional and only needed for the virtual assistant feature.
-=======
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-
