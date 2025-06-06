@@ -1,12 +1,11 @@
+import argparse
 import asyncio
 import json
-import sys
 from pathlib import Path
 import aiosqlite
 
 from db import init_kb_db, KB_DB_PATH
 
-USAGE = "Usage: load_kb.py HATHA_JSON YOGA_JSON GENERAL_JSON"
 
 async def load_sector(db: aiosqlite.Connection, category: str, file_path: str) -> None:
     path = Path(file_path)
@@ -32,13 +31,14 @@ async def main(paths):
         await db.commit()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print(USAGE)
-        sys.exit(1)
-    args = sys.argv[1:4]
+    parser = argparse.ArgumentParser(description="Load knowledge base JSON files")
+    parser.add_argument("hatha_json")
+    parser.add_argument("yoga_json")
+    parser.add_argument("general_json")
+    args = parser.parse_args()
     pairs = [
-        ("hatha", args[0]),
-        ("yoga", args[1]),
-        ("general", args[2]),
+        ("hatha", args.hatha_json),
+        ("yoga", args.yoga_json),
+        ("general", args.general_json),
     ]
     asyncio.run(main(pairs))

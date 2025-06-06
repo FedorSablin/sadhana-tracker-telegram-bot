@@ -1,11 +1,20 @@
 import os
-import sys
 import aiosqlite
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import virtual_assistant
+import importlib.machinery
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+db_loader = importlib.machinery.SourceFileLoader("db", str(ROOT / "db.py"))
+db_loader.load_module()
+
+va_loader = importlib.machinery.SourceFileLoader(
+    "virtual_assistant", str(ROOT / "virtual_assistant.py")
+)
+virtual_assistant = va_loader.load_module()
 
 class DummyResp:
     def __init__(self, content):
