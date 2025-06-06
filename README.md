@@ -33,11 +33,12 @@ Interact with the bot in Telegram using commands like `/log`, `/progress` and `/
 
 ## Optional: load the knowledge base
 
-If you have additional reference materials for the assistant, you can load them into the database with:
+If you have additional reference materials for the assistant, load them into the knowledge base using `load_kb.py`. Specify JSON files for one or more categories:
 ```bash
-python load_kb.py path/to/articles.csv
+python load_kb.py --hatha Йогасаны.json --hatha "Сурья Крийя.json" \
+                 --general "Общие вопросы.json"
 ```
-This step is optional and only needed for the virtual assistant feature.
+Run the script again if you want to add more files later. This step is optional and only needed for the virtual assistant feature.
 =======
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 

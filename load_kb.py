@@ -1,12 +1,32 @@
 import asyncio
 import json
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 import aiosqlite
 
 from db import init_kb_db, KB_DB_PATH
 
-USAGE = "Usage: load_kb.py HATHA_JSON YOGA_JSON GENERAL_JSON"
+
+def parse_args() -> list[tuple[str, str]]:
+    """Parse CLI arguments and return (category, path) pairs."""
+    parser = ArgumentParser(description="Load knowledge base JSON files")
+    parser.add_argument("--hatha", action="append", default=[], help="JSON file for hatha yoga")
+    parser.add_argument("--yoga", action="append", default=[], help="JSON file for yoga")
+    parser.add_argument("--general", action="append", default=[], help="JSON file for general topics")
+    args = parser.parse_args()
+
+    pairs: list[tuple[str, str]] = []
+    for path in args.hatha:
+        pairs.append(("hatha", path))
+    for path in args.yoga:
+        pairs.append(("yoga", path))
+    for path in args.general:
+        pairs.append(("general", path))
+    if not pairs:
+        parser.error("At least one JSON file must be provided")
+    return pairs
+
 
 async def load_sector(db: aiosqlite.Connection, category: str, file_path: str) -> None:
     path = Path(file_path)
@@ -32,13 +52,4 @@ async def main(paths):
         await db.commit()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print(USAGE)
-        sys.exit(1)
-    args = sys.argv[1:4]
-    pairs = [
-        ("hatha", args[0]),
-        ("yoga", args[1]),
-        ("general", args[2]),
-    ]
-    asyncio.run(main(pairs))
+    asyncio.run(main(parse_args()))
