@@ -105,13 +105,24 @@ async def init_db():
 
         """)
         # 👇 Таблица базы знаний для виртуального ассистента
-        await db.execute("""
+        await db.execute(
+            """
             CREATE TABLE IF NOT EXISTS knowledge_base (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL
             );
-        """)
+            """
+        )
+
+        # 🛠 авто‑миграция колонки category
+        cur = await db.execute("PRAGMA table_info(knowledge_base)")
+        cols = [row[1] for row in await cur.fetchall()]
+        if "category" not in cols:
+            await db.execute(
+                "ALTER TABLE knowledge_base ADD COLUMN category TEXT NOT NULL DEFAULT ''"
+            )
         await db.commit()
 
     # Создаём отдельную БД знаний
